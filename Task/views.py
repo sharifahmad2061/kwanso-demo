@@ -8,25 +8,28 @@ from Task.models import Task
 from Task.serializers import UserSerializer, TaskSerializer
 
 # Create your views here.
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by("-date_joined")
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class CreateUserViewSet(viewsets.ViewSet):
+    def create(self, request):
+        print(request.data)
+        user = User(
+            username=request.data.get("username"),
+            email=request.data.get("email"),
+            first_name=request.data.get("first_name"),
+            last_name=request.data.get("last_name"),
+            password=request.data.get("password"),
+        )
+        print("1", user)
+        user = User.objects.get_or_create(user)
+        print("2", user)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
 
 
-class CreateUser(CreateAPIView):
-    serializer_class = UserSerializer
-
-
-class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+class ListUserViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
-        print(self.request.user)
-        queryset = Task.objects.filter(created_by=request.user)
-        serializer = TaskSerializer(queryset, many=True, context={"request": request})
+        serializer = UserSerializer(request.user, context={"request": request})
         return Response(serializer.data)
 
 
@@ -34,22 +37,18 @@ class ListTaskViewSet(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
-        queryset = Task.objects.filter(created_by=self.request.user)
+        queryset = Task.objects.filter(created_by=request.user)
         serializer = TaskSerializer(queryset, many=True, context={"request": request})
         return Response(serializer.data)
 
 
 class CreateTaskViewSet(viewsets.ViewSet):
-    http_method_names = ["POST"]
-    queryset = Task.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
     def create(self, request):
         try:
             print(request.data)
-            task = Task(
-                content=request.data.get("content"), created_by=self.request.user
-            )
+            task = Task(content=request.data.get("content"), created_by=request.user)
             print("1", task)
             task = Task.objects.create(task)
             print("2", task)
