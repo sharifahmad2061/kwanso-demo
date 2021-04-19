@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from rest_framework import viewsets, permissions
+from rest_framework.generics import CreateAPIView
 from Task.models import Task
 from Task.serializers import UserSerializer, TaskSerializer
 
@@ -9,6 +10,10 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by("-date_joined")
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class CreateUser(CreateAPIView):
+    serializer_class = UserSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
