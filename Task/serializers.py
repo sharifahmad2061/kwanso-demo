@@ -3,13 +3,13 @@ from Task.models import Task
 from rest_framework import serializers
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "username", "email", "password", "url"]
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ["content", "created_on", "created_by"]
+        fields = ["content", "created_on"]
