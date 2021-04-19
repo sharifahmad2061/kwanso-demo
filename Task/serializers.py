@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ["first_name", "last_name", "username", "email", "password", "url"]
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Task
-        fields = ["content", "created_on"]
+        fields = ["content", "created_on", "created_by"]

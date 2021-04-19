@@ -13,27 +13,39 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from typing import List
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView
 from Task.views import (
-    UserViewSet,
-    TaskViewSet,
-    CreateUser,
+    CreateUserViewSet,
+    RetrieveUserViewSet,
     CreateTaskViewSet,
     ListTaskViewSet,
+    UsersViewSet,
+    TaskViewSet,
 )
 
 
 router = routers.DefaultRouter()
-router.register("users", UserViewSet)
-router.register("tasks", TaskViewSet)
-router.register("create-task", CreateTaskViewSet, basename="task")
-router.register("list-tasks", ListTaskViewSet, basename="task")
+# router.register("register", CreateUserViewSet, basename="registeruser")
+
+# router.register("user", RetrieveUserViewSet, basename="showuser")
+# router.register("create-task", CreateTaskViewSet, basename="createtask")
+# router.register("list-tasks", ListTaskViewSet, basename="listtask")
+router.register("user", UsersViewSet)
+user_create = UsersViewSet.as_view({"post": "create"})
+user_list = UsersViewSet.as_view({"get": "list"})
+task_list = TaskViewSet.as_view({"get": "list"})
+task_create = TaskViewSet.as_view({"post": "create"})
+
 urlpatterns = [
     path("", include(router.urls)),
     path("auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path("register/", CreateUser.as_view(), name="create_user"),
+    path("login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("admin/", admin.site.urls),
+    path("register/", user_create, name="user_register"),
+    path("user/", user_list, name="current_user"),
+    path("create-task/", task_create, name="task_create"),
+    path("list-task/", task_list, name="task_list"),
 ]
