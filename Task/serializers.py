@@ -24,4 +24,4 @@ class UserSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Task
-        fields = ["content", "created_on", "created_by"]
+        fields = ["content"]

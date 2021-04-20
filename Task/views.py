@@ -17,8 +17,9 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         try:
-            serializer = UserSerializer(self.request.user)
-            return Response(serializer.data)
+            if self.request.user.is_authenticated:
+                serializer = self.get_serializer(self.request.user)
+                return Response(serializer.data)
         except Exception as exc:
             return Response(
                 {"message": exc.__str__()}, status=status.HTTP_400_BAD_REQUEST
@@ -29,3 +30,17 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        try:
+            query = self.get_queryset().filter(created_by=self.request.user)
+            serializer = self.get_serializer(query, many=True)
+            print("serializer", serializer)
+            return Response(serializer.data)
+        except Exception as exc:
+            return Response(
+                {"message": exc.__str__()}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
